@@ -6,11 +6,15 @@ import 'package:client/models/product.dart';
 import 'package:client/models/product_variants.dart';
 
 List<ProductVariants> generateVariants(
-    List<Attribute> attributes, List<ProductVariants> existingVariants) {
+  List<Attribute> attributes,
+  List<ProductVariants> existingVariants,
+) {
   // Generate combinations of attribute values
   List<List<AttributeValue>> generateCombinations(
-      List<Attribute> attributes, int currentIndex,
-      {List<AttributeValue> currentCombination = const []}) {
+    List<Attribute> attributes,
+    int currentIndex, {
+    List<AttributeValue> currentCombination = const [],
+  }) {
     if (currentIndex == attributes.length) {
       return [List<AttributeValue>.from(currentCombination)];
     }
@@ -29,10 +33,7 @@ List<ProductVariants> generateVariants(
 
     for (final value in currentAttribute.values) {
       final newCombination = List<AttributeValue>.from(currentCombination)
-        ..add(AttributeValue(
-          attributeId: currentAttribute.id,
-          value: value,
-        ));
+        ..add(AttributeValue(attributeId: currentAttribute.id, value: value));
 
       final nextCombinations = generateCombinations(
         attributes,
@@ -77,8 +78,9 @@ List<ProductVariants> generateVariants(
     if (existingVariantMap.containsKey(key)) {
       newVariants.add(existingVariantMap[key]!);
     } else {
-      generatedCombinations
-          .add(combination); // Add combination for further processing
+      generatedCombinations.add(
+        combination,
+      ); // Add combination for further processing
     }
   }
 
@@ -97,9 +99,10 @@ List<ProductVariants> generateVariants(
       // Count matching attributes
       int matchCount = 0;
       for (final attr in combination) {
-        if (existingVariant.attributes.any((a) =>
-            a.attributeId == attr.attributeId &&
-            a.value.contains(attr.value))) {
+        if (existingVariant.attributes.any(
+          (a) =>
+              a.attributeId == attr.attributeId && a.value.contains(attr.value),
+        )) {
           matchCount++;
         }
       }
@@ -121,25 +124,31 @@ List<ProductVariants> generateVariants(
 
     // Create new variant, inheriting from selected parent if found
     if (selectedParent != null) {
-      newVariants.add(ProductVariants(
-        id: 'new-${DateTime.now().millisecondsSinceEpoch}-${DateTime.now().microsecond}-${Random().nextInt(1000)}',
-        attributes: combination,
-        price: selectedParent.price,
-        basePrice: selectedParent.basePrice,
-        stock: selectedParent.stock,
-        discount: selectedParent.discount,
-        // images: selectedParent.images,
-      ));
+      newVariants.add(
+        ProductVariants(
+          id:
+              'new-${DateTime.now().millisecondsSinceEpoch}-${DateTime.now().microsecond}-${Random().nextInt(1000)}',
+          attributes: combination,
+          price: selectedParent.price,
+          basePrice: selectedParent.basePrice,
+          stock: selectedParent.stock,
+          discount: selectedParent.discount,
+          // images: selectedParent.images,
+        ),
+      );
     } else {
-      newVariants.add(ProductVariants(
-        id: 'new-${DateTime.now().millisecondsSinceEpoch}-${DateTime.now().microsecond}-${Random().nextInt(1000)}',
-        attributes: combination,
-        price: "0",
-        basePrice: "0",
-        discount: 0,
-        stock: 0,
-        images: [],
-      ));
+      newVariants.add(
+        ProductVariants(
+          id:
+              'new-${DateTime.now().millisecondsSinceEpoch}-${DateTime.now().microsecond}-${Random().nextInt(1000)}',
+          attributes: combination,
+          price: "0",
+          basePrice: "0",
+          discount: 0,
+          stock: 0,
+          images: [],
+        ),
+      );
     }
   }
 
@@ -155,10 +164,7 @@ List<AttributeValueInput> mapProductToAttributes(Product product) {
       String attributeName = attribute.name!;
       String attributeValue = attribute.value;
 
-      Attribute attributeObj = Attribute(
-        id: attributeId,
-        name: attributeName,
-      );
+      Attribute attributeObj = Attribute(id: attributeId, name: attributeName);
 
       var existingInput = attributeValues.firstWhere(
         (input) => input.attribute.id == attributeId,
